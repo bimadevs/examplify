@@ -1,104 +1,124 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Users, PlusCircle, Trash2 } from "lucide-react";
+import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
+import { BookCopy, CheckCircle, Clock, KeyRound, ArrowRight } from "lucide-react";
+import Link from "next/link";
 import type { Student } from "@/lib/types";
 
-export default function SiswaPage() {
-  const [students, setStudents] = useState<Student[]>([
-    { id: "S001", name: "Alex Mercer", class: "12-A" },
-    { id: "S002", name: "Zara Evergreen", class: "11-B" },
-  ]);
-  const [newStudent, setNewStudent] = useState({ name: "", class: "" });
+// Mock data
+const enrolledClasses = [
+    { id: "C001", name: "Fisika Kuantum Lanjutan", teacher: "Dr. Elara Vance", code: "PHY-ADV" },
+    { id: "C002", name: "Sejarah Peradaban Kuno", teacher: "Prof. Kaelen Reed", code: "HIST-ANC" },
+];
 
-  const handleAddStudent = () => {
-    if (newStudent.name && newStudent.class) {
-      setStudents([
-        ...students,
-        { id: `S${String(students.length + 1).padStart(3, '0')}`, ...newStudent },
-      ]);
-      setNewStudent({ name: "", class: "" });
+export default function SiswaDashboard() {
+  const [student, setStudent] = useState<Student | null>(null);
+  const [classCode, setClassCode] = useState("");
+
+  useEffect(() => {
+    const userInfo = JSON.parse(localStorage.getItem("userInfo") || "null");
+    if (userInfo) {
+        setStudent(userInfo);
     }
-  };
+  }, []);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setNewStudent(prev => ({ ...prev, [name]: value }));
+  const handleJoinClass = () => {
+    // Logic to join a class would go here
+    console.log(`Joining class with code: ${classCode}`);
   };
 
   return (
-    <div className="p-4 sm:p-6 lg:p-8 space-y-6">
-      <header className="flex items-center gap-4">
-        <Users className="w-8 h-8 text-primary" />
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Data Siswa</h1>
-          <p className="text-muted-foreground">Kelola data siswa yang terdaftar di platform Examplify.</p>
-        </div>
+    <div className="p-4 sm:p-6 lg:p-8 space-y-8">
+      <header className="space-y-2">
+        <h1 className="text-4xl font-bold tracking-tight text-primary">Dashboard Siswa</h1>
+        <p className="text-xl text-muted-foreground">Selamat datang, {student?.name}! Siap untuk belajar?</p>
       </header>
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-1">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <PlusCircle className="w-5 h-5" />
-                Tambah Siswa Baru
-              </CardTitle>
-               <CardDescription>Masukkan detail siswa untuk ditambahkan ke sistem.</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="name">Nama Siswa</Label>
-                <Input id="name" name="name" placeholder="Contoh: John Doe" value={newStudent.name} onChange={handleInputChange} />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="class">Kelas</Label>
-                <Input id="class" name="class" placeholder="Contoh: 12-A" value={newStudent.class} onChange={handleInputChange} />
-              </div>
-              <Button onClick={handleAddStudent} className="w-full">
-                <PlusCircle className="mr-2 h-4 w-4" /> Tambah Siswa
-              </Button>
-            </CardContent>
-          </Card>
-        </div>
-
-        <div className="lg:col-span-2">
-          <Card>
-            <CardHeader>
-              <CardTitle>Daftar Siswa</CardTitle>
+      
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <Card>
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+                <CardTitle className="text-sm font-medium">Kelas Terdaftar</CardTitle>
+                <BookCopy className="w-4 h-4 text-muted-foreground"/>
             </CardHeader>
             <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>ID Siswa</TableHead>
-                    <TableHead>Nama</TableHead>
-                    <TableHead>Kelas</TableHead>
-                    <TableHead className="text-right">Aksi</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {students.map((student) => (
-                    <TableRow key={student.id}>
-                      <TableCell className="font-medium">{student.id}</TableCell>
-                      <TableCell>{student.name}</TableCell>
-                      <TableCell>{student.class}</TableCell>
-                      <TableCell className="text-right">
-                        <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive">
-                           <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+                <div className="text-2xl font-bold">{enrolledClasses.length} Kelas</div>
+                <p className="text-xs text-muted-foreground">Terus semangat belajar!</p>
             </CardContent>
-          </Card>
+        </Card>
+        <Card>
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+                <CardTitle className="text-sm font-medium">Ujian Selesai</CardTitle>
+                <CheckCircle className="w-4 h-4 text-muted-foreground"/>
+            </CardHeader>
+            <CardContent>
+                <div className="text-2xl font-bold">3 Ujian</div>
+                <p className="text-xs text-muted-foreground">Lihat hasil di halaman hasil.</p>
+            </CardContent>
+        </Card>
+        <Card>
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+                <CardTitle className="text-sm font-medium">Ujian Mendatang</CardTitle>
+                <Clock className="w-4 h-4 text-muted-foreground"/>
+            </CardHeader>
+            <CardContent>
+                <div className="text-2xl font-bold">1 Ujian</div>
+                <p className="text-xs text-muted-foreground">Jadwal: 25 Des 2024</p>
+            </CardContent>
+        </Card>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2">
+            <Card>
+                <CardHeader>
+                    <CardTitle>Kelas Anda</CardTitle>
+                    <CardDescription>Berikut adalah daftar kelas yang Anda ikuti.</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                    {enrolledClasses.map(c => (
+                        <Card key={c.id} className="hover:bg-muted/50 transition-colors">
+                           <CardContent className="p-4 flex justify-between items-center">
+                               <div>
+                                   <h3 className="font-semibold">{c.name}</h3>
+                                   <p className="text-sm text-muted-foreground">Pengajar: {c.teacher}</p>
+                               </div>
+                               <Button asChild variant="outline" size="sm">
+                                   <Link href={`/siswa/kelas/${c.id}`}>
+                                       Lihat Kelas <ArrowRight className="ml-2 w-4 h-4" />
+                                   </Link>
+                               </Button>
+                           </CardContent>
+                        </Card>
+                    ))}
+                </CardContent>
+            </Card>
+        </div>
+        <div>
+            <Card>
+                <CardHeader>
+                    <CardTitle>Gabung Kelas Baru</CardTitle>
+                    <CardDescription>Masukkan kode kelas dari guru Anda.</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-2">
+                    <Label htmlFor="class-code" className="sr-only">Kode Kelas</Label>
+                    <div className="flex gap-2">
+                       <Input id="class-code" value={classCode} onChange={e => setClassCode(e.target.value)} placeholder="Contoh: PHY-ADV"/>
+                        <Button onClick={handleJoinClass}>
+                            <KeyRound className="mr-2 h-4 w-4"/> Gabung
+                        </Button>
+                    </div>
+                </CardContent>
+            </Card>
+             <Alert className="mt-4">
+                <AlertTitle>Ujian Tersedia!</AlertTitle>
+                <AlertDescription>
+                    Ada ujian baru di kelas Fisika. <Link href="/ujian" className="font-bold text-primary hover:underline">Kerjakan sekarang!</Link>
+                </AlertDescription>
+            </Alert>
         </div>
       </div>
     </div>

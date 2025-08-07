@@ -20,22 +20,50 @@ import {
   FileText,
   BarChart3,
   BookOpenCheck,
+  LogOut,
+  BookPlus,
+  ClipboardPenLine,
 } from "lucide-react";
 import { useSidebar } from "@/components/ui/sidebar";
 import { Button } from "./ui/button";
+import { useRouter } from "next/navigation";
+import React from "react";
 
-const navItems = [
-  { href: "/", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/guru", label: "Data Guru", icon: UserCog },
-  { href: "/siswa", label: "Data Siswa", icon: Users },
+const teacherNavItems = [
+  { href: "/guru", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/guru/kelas", label: "Kelola Kelas", icon: Users },
   { href: "/soal", label: "Bank Soal", icon: Library },
+];
+
+const studentNavItems = [
+  { href: "/siswa", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/siswa/kelas", label: "Kelas Saya", icon: BookPlus },
   { href: "/ujian", label: "Ujian", icon: FileText },
-  { href: "/hasil", label: "Hasil", icon: BarChart3 },
+  { href: "/hasil", label: "Hasil Ujian", icon: BarChart3 },
 ];
 
 export function SidebarNav() {
   const pathname = usePathname();
-  const { open, setOpen } = useSidebar();
+  const { setOpen } = useSidebar();
+  const router = useRouter();
+  const [role, setRole] = React.useState<"teacher" | "student" | null>(null);
+
+  React.useEffect(() => {
+    const userRole = localStorage.getItem("userRole") as "teacher" | "student" | null;
+    setRole(userRole);
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem("userRole");
+    localStorage.removeItem("userInfo");
+    router.push("/");
+  };
+  
+  const navItems = role === 'teacher' ? teacherNavItems : studentNavItems;
+
+  if (!role) {
+    return null; // Or a loading spinner
+  }
 
   return (
     <Sidebar>
@@ -55,7 +83,6 @@ export function SidebarNav() {
                 <SidebarMenuButton
                   isActive={pathname === item.href}
                   tooltip={item.label}
-                  asChild={false} 
                 >
                   <item.icon className="h-5 w-5" />
                   <span>{item.label}</span>
@@ -66,6 +93,14 @@ export function SidebarNav() {
         </SidebarMenu>
       </SidebarContent>
       <SidebarFooter>
+        <SidebarMenu>
+            <SidebarMenuItem>
+                 <SidebarMenuButton onClick={handleLogout}>
+                    <LogOut className="h-5 w-5" />
+                    <span>Logout</span>
+                </SidebarMenuButton>
+            </SidebarMenuItem>
+        </SidebarMenu>
         <SidebarTrigger/>
       </SidebarFooter>
     </Sidebar>

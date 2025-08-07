@@ -126,7 +126,7 @@ export default function SoalPage() {
                       <AccordionContent>
                         <ul className="space-y-2">
                           {q.options.map((opt, i) => (
-                            <li key={i} className={`flex items-center gap-2 p-2 rounded-md ${i === q.correctAnswerIndex ? 'bg-green-100 text-green-800' : ''}`}>
+                            <li key={i} className={`flex items-center gap-2 p-2 rounded-md ${i === q.correctAnswerIndex ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300' : ''}`}>
                               {i === q.correctAnswerIndex && <CheckCircle className="w-4 h-4" />}
                               <span>{opt}</span>
                             </li>
@@ -152,3 +152,4 @@ export default function SoalPage() {
     </div>
   );
 }
+
