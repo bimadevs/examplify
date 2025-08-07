@@ -1,3 +1,4 @@
+
 "use client";
 
 import Link from "next/link";
@@ -33,11 +34,11 @@ const teacherNavItems = [
   { href: "/guru", label: "Dashboard", icon: LayoutDashboard },
   { href: "/guru/kelas", label: "Kelola Kelas", icon: Users },
   { href: "/soal", label: "Bank Soal", icon: Library },
+  { href: "/hasil", label: "Analisis Siswa", icon: BarChart3 },
 ];
 
 const studentNavItems = [
   { href: "/siswa", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/siswa/kelas", label: "Kelas Saya", icon: BookPlus },
   { href: "/ujian", label: "Ujian", icon: FileText },
   { href: "/hasil", label: "Hasil Ujian", icon: BarChart3 },
 ];
