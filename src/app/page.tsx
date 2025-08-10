@@ -10,6 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { BookOpenCheck, Loader2, GraduationCap, Users, Eye, EyeOff, Mail, Lock, User } from "lucide-react";
 import { signIn, signUp, getCurrentUser } from "@/lib/database";
+import Image from 'next/image';
 
 type Role = "teacher" | "student";
 
@@ -185,7 +186,10 @@ export default function AuthPage() {
           <div className="text-center z-10 max-w-md">
             <div className="mb-8">
               <div className="inline-flex items-center justify-center w-20 h-20 bg-white/20 backdrop-blur-sm rounded-2xl mb-6">
-                <BookOpenCheck className="w-10 h-10 text-white" />
+                <Image
+                src="/logo-color.png" alt="Bimadev Logo" width={100} height={100}
+                >
+                </Image>
               </div>
               <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4 leading-tight">
                 Selamat Datang di
