@@ -11,6 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Library, PlusCircle, BrainCircuit, Loader2, CheckCircle, Save, PenSquare } from "lucide-react";
 import type { Question, QuestionBank } from "@/lib/types";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { createQuestionBank } from "@/lib/database";
 import { Textarea } from "@/components/ui/textarea";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
@@ -85,7 +86,7 @@ export default function SoalPage() {
   };
 
 
-  const handleSaveQuestions = () => {
+  const handleSaveQuestions = async () => {
     if (generatedQuestions.length === 0) {
       toast({
         title: "Tidak ada soal",
@@ -95,39 +96,49 @@ export default function SoalPage() {
       return;
     }
     
-    const newQuestionBank: QuestionBank = {
-      topic,
-      questions: generatedQuestions,
-      createdAt: new Date().toISOString(),
-    };
-    
-    const existingBanks: QuestionBank[] = JSON.parse(localStorage.getItem("questionBanks") || "[]");
-    localStorage.setItem("questionBanks", JSON.stringify([...existingBanks, newQuestionBank]));
-    
-    toast({
-      title: "Bank Soal Disimpan",
-      description: `Bank soal untuk topik "${topic}" berhasil disimpan.`,
-    });
-    setGeneratedQuestions([]);
-    setTopic("");
+    try {
+      const { data, error } = await createQuestionBank(topic, generatedQuestions);
+      
+      if (error) {
+        toast({
+          title: "Gagal Menyimpan",
+          description: error.message,
+          variant: "destructive",
+        });
+        return;
+      }
+      
+      toast({
+        title: "Bank Soal Disimpan",
+        description: `Bank soal untuk topik "${topic}" berhasil disimpan.`,
+      });
+      
+      setGeneratedQuestions([]);
+      setTopic("");
+    } catch (error) {
+      toast({
+        title: "Terjadi Kesalahan",
+        description: "Gagal menyimpan bank soal. Silakan coba lagi.",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
-    <div className="p-4 sm:p-6 lg:p-8 space-y-6">
-      <header className="flex items-center gap-4">
-        <Library className="w-8 h-8 text-primary" />
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Bank Soal</h1>
-          <p className="text-muted-foreground">Buat soal ujian secara otomatis menggunakan AI atau secara manual.</p>
-        </div>
-      </header>
-      
-      <div className="space-y-2">
-        <Label htmlFor="topic">Topik Ujian</Label>
-        <Input id="topic" value={topic} onChange={(e) => setTopic(e.target.value)} placeholder="Masukkan topik ujian secara keseluruhan" />
-        <p className="text-sm text-muted-foreground">Topik ini akan digunakan untuk bank soal yang akan disimpan.</p>
+    <div className="p-6 md:p-8 pt-16 md:pt-8 max-w-7xl mx-auto">
+      <div className="mb-8">
+        <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2 flex items-center gap-3">
+          <Library className="w-8 h-8 text-primary" />
+          Bank Soal
+        </h1>
+        <p className="text-gray-600">Buat soal ujian secara otomatis menggunakan AI atau secara manual.</p>
       </div>
-
+      
+      <div className="space-y-2 mb-6">
+        <Label htmlFor="topic">Topik Ujian</Label>
+        <Input id="topic" value={topic} onChange={(e) => setTopic(e.target.value)} placeholder="Masukkan topik ujian secara keseluruhan" className="bg-white" />
+        <p className="text-sm text-gray-500">Topik ini akan digunakan untuk bank soal yang akan disimpan.</p>
+      </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-1">

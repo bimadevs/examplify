@@ -29,6 +29,9 @@ import { useSidebar } from "@/components/ui/sidebar";
 import { Button } from "./ui/button";
 import { useRouter } from "next/navigation";
 import React from "react";
+import { supabase } from "@/lib/supabase";
+import { getCurrentUser, signOut } from "@/lib/database";
+import type { User } from "@/lib/supabase";
 
 const teacherNavItems = [
   { href: "/guru", label: "Dashboard", icon: LayoutDashboard },
@@ -47,23 +50,52 @@ export function SidebarNav() {
   const pathname = usePathname();
   const { setOpen } = useSidebar();
   const router = useRouter();
-  const [role, setRole] = React.useState<"teacher" | "student" | null>(null);
+  const [user, setUser] = React.useState<User | null>(null);
+  const [loading, setLoading] = React.useState(true);
 
   React.useEffect(() => {
-    const userRole = localStorage.getItem("userRole") as "teacher" | "student" | null;
-    setRole(userRole);
-  }, []);
+    // Get current user
+    getCurrentUser().then(({ user, error }) => {
+      if (user) {
+        setUser(user);
+      }
+      setLoading(false);
+    });
 
-  const handleLogout = () => {
-    localStorage.removeItem("userRole");
-    localStorage.removeItem("userInfo");
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        if (event === 'SIGNED_IN' && session?.user) {
+          const { user } = await getCurrentUser();
+          setUser(user);
+        } else if (event === 'SIGNED_OUT') {
+          setUser(null);
+          router.push("/");
+        }
+      }
+    );
+
+    return () => subscription.unsubscribe();
+  }, [router]);
+
+  const handleLogout = async () => {
+    await signOut();
+    setUser(null);
     router.push("/");
   };
   
-  const navItems = role === 'teacher' ? teacherNavItems : studentNavItems;
+  const navItems = user?.role === 'teacher' ? teacherNavItems : studentNavItems;
 
-  if (!role) {
-    return null; // Or a loading spinner
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return null;
   }
 
   return (

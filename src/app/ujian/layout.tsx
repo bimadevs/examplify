@@ -1,6 +1,4 @@
-
-import { SidebarProvider } from '@/components/ui/sidebar';
-import { SidebarNav } from '@/components/SidebarNav';
+import { SimpleSidebar } from '@/components/SimpleSidebar';
 
 export default function UjianLayout({
   children,
@@ -8,13 +6,11 @@ export default function UjianLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <SidebarProvider>
-      <SidebarNav />
-      <div className="flex-1 md:ml-[--sidebar-width-icon] lg:ml-0">
-        <main className="min-h-screen">
-          {children}
-        </main>
-      </div>
-    </SidebarProvider>
+    <div className="min-h-screen bg-gray-50">
+      <SimpleSidebar />
+      <main className="md:ml-64 min-h-screen">
+        {children}
+      </main>
+    </div>
   );
 }

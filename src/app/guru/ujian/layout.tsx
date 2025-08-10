@@ -1,7 +1,6 @@
-
 import { SimpleSidebar } from '@/components/SimpleSidebar';
 
-export default function SiswaLayout({
+export default function GuruUjianLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
